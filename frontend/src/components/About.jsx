@@ -1,36 +1,74 @@
-import { translations } from '../translations'
+import {translations} from '../translations'
+import aboutIMG1 from '../assets/images/namaste1.jpg'
+import aboutIMG2 from '../assets/images/namaste2.jpg'
+import spaIcon from '../assets/icons/spa.svg'
+import buddhismIcon from '../assets/icons/buddhism.svg'
+import Parallax from './Parallax'
 
-export default function About({ language }) {
+function renderWithEmphasis(text) {
+    return text.split('**').map((part, i) =>
+        i % 2 === 1
+            ? <strong key={i} className="font-bold text-dark-gray">{part}</strong>
+            : part
+    )
+}
+
+export default function About({language}) {
     const t = translations[language]
 
     return (
-        <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 bg-bg-secondary">
+        <section id="about" className="scroll-mt-20 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-dark-brown">
             <div className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    {/* Text Content - Left on desktop, top on mobile */}
-                    <div className="order-2 lg:order-1">
-                        <h2 className="text-4xl md:text-5xl font-bold text-text-primary mb-6">
-                            About Us
-                        </h2>
-                        <p className="text-lg text-text-primary mb-4 leading-relaxed">
-                            Welcome to our spa sanctuary. We believe in the power of relaxation and holistic wellness.
-                            Our team of experienced therapists is dedicated to providing you with the ultimate rejuvenation experience.
-                        </p>
-                        <p className="text-lg text-text-primary leading-relaxed">
-                            From traditional massages to modern wellness treatments, we offer a wide range of services
-                            designed to restore your mind, body, and spirit. Step into our peaceful environment and
-                            let us help you find your inner balance.
-                        </p>
-                    </div>
+                <Parallax speed={0.12} max={16}>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-dark-gray mb-6 sm:mb-8 text-center lg:text-left">
+                        {t.about.title}
+                    </h2>
+                </Parallax>
 
-                    {/* Image - Right on desktop, bottom on mobile */}
-                    <div className="order-1 lg:order-2">
+                {/* 2x2 grid: paragraph left, image right, on both rows */}
+                <div className="grid grid-cols-2 gap-x-4 sm:gap-x-8 lg:gap-x-12 gap-y-8 sm:gap-y-12 items-center">
+                    {/* Paragraph 1 — faint spa icon watermark filling the block behind the text */}
+                    <Parallax speed={0.1} max={14} className="relative">
                         <img
-                            src="https://images.unsplash.com/photo-1544367567-0d6fcffe7f1f?w=600&h=600&fit=crop"
-                            alt="Spa treatment"
-                            className="w-full h-96 object-cover rounded-lg shadow-lg"
+                            src={spaIcon}
+                            alt=""
+                            aria-hidden="true"
+                            className="absolute inset-0 z-0 w-full h-full object-contain opacity-[0.08] pointer-events-none select-none"
                         />
-                    </div>
+                        <p className="relative z-10 text-xs sm:text-base lg:text-lg text-dark-gray leading-relaxed">
+                            {renderWithEmphasis(t.about.paragraph1)}
+                        </p>
+                    </Parallax>
+
+                    <Parallax speed={0.08} max={14}>
+                        <img
+                            src={aboutIMG1}
+                            alt="Spa treatment"
+                            className="w-full h-40 sm:h-64 lg:h-96 object-cover rounded-lg shadow-lg"
+                        />
+                    </Parallax>
+
+                    {/* Second image on the left, paragraph 2 on the right */}
+                    <Parallax speed={0.08} max={14}>
+                        <img
+                            src={aboutIMG2}
+                            alt="Namaste studio"
+                            className="w-full h-40 sm:h-64 lg:h-96 object-cover rounded-lg shadow-lg"
+                        />
+                    </Parallax>
+
+                    {/* Paragraph 2 — faint buddhism icon watermark filling the block behind the text */}
+                    <Parallax speed={0.1} max={14} className="relative">
+                        <img
+                            src={buddhismIcon}
+                            alt=""
+                            aria-hidden="true"
+                            className="absolute inset-0 z-0 w-full h-full object-contain opacity-[0.08] pointer-events-none select-none"
+                        />
+                        <p className="relative z-10 text-xs sm:text-base lg:text-lg text-dark-gray leading-relaxed">
+                            {renderWithEmphasis(t.about.paragraph2)}
+                        </p>
+                    </Parallax>
                 </div>
             </div>
         </section>
