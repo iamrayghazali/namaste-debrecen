@@ -1,28 +1,29 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import Navbar from './components/Navbar'
 import Hero from "./components/Hero.jsx";
 import About from "./components/About.jsx";
+import Packages from "./components/Packages.jsx";
+import GiftCard from "./components/GiftCard.jsx";
+import Contact from "./components/Contact.jsx";
+import {translations} from './translations'
 
 export default function App() {
-  const [language, setLanguage] = useState('en')
+    const [language, setLanguage] = useState('hu')
 
-  return (
-      <div className="min-h-screen bg-bg-primary">
-        <Navbar language={language} setLanguage={setLanguage} />
+    useEffect(() => {
+        const t = translations[language]
+        document.title = `${t.hero.titleMain} ${t.hero.titleSub}`
+    }, [language])
 
-        {/* Placeholder sections */}
-          <Hero language={language} />
-          <About language={language} />
-
-        <section id="packages" className="h-screen flex items-center justify-center bg-bg-primary">
-          <h1 className="text-4xl font-bold text-eucalyptus-light">Packages</h1>
-        </section>
-        <section id="giftcard" className="h-screen flex items-center justify-center bg-bg-secondary">
-          <h1 className="text-4xl font-bold text-eucalyptus-light">Gift Card</h1>
-        </section>
-        <section id="contact" className="h-screen flex items-center justify-center bg-bg-primary">
-          <h1 className="text-4xl font-bold text-eucalyptus-light">Contact</h1>
-        </section>
-      </div>
-  )
+    return (
+        <div className="min-h-screen bg-bg-primary">
+            <Navbar language={language} setLanguage={setLanguage}/>
+            {/* Placeholder sections */}
+            <Hero language={language}/>
+            <About language={language}/>
+            <Packages language={language}/>
+            <GiftCard language={language}/>
+            <Contact language={language}/>
+        </div>
+    )
 }
