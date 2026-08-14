@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+@theme {
+  --color-light-gray: #E7DED2;
+  --color-dark-brown: #D4A876;
+  --color-light-brown: #F0E0BD;
+  --color-dark-gray: #3A332D;
+  --color-light-green: #8FB09F;
+
+  /* Inter is the body font, applied site-wide by default. */
+  --font-sans: 'Inter', sans-serif;
+  /* Kalnia is the primary/display font — opt in with font-kalnia. */
+  --font-kalnia: 'Kalnia', serif;
+}
