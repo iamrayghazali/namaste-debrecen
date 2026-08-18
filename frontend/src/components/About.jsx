@@ -1,6 +1,6 @@
 import {translations} from '../translations'
-import aboutIMG1 from '../assets/images/namaste1.jpg'
-import aboutIMG2 from '../assets/images/namaste2.jpg'
+import aboutIMG1 from '../assets/images/namaste1.webp'
+import aboutIMG2 from '../assets/images/namaste2.webp'
 import spaIcon from '../assets/icons/spa.svg'
 import buddhismIcon from '../assets/icons/buddhism.svg'
 import Parallax from './Parallax'
@@ -17,7 +17,7 @@ export default function About({language}) {
     const t = translations[language]
 
     return (
-        <section id="about" className="scroll-mt-20 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-dark-brown">
+        <section id="about" className="scroll-mt-20 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-light-gray overflow-hidden">
             <div className="max-w-6xl mx-auto">
                 <Parallax speed={0.12} max={16}>
                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-dark-gray mb-6 sm:mb-8 text-center lg:text-left">
@@ -33,7 +33,7 @@ export default function About({language}) {
                             src={spaIcon}
                             alt=""
                             aria-hidden="true"
-                            className="absolute inset-0 z-0 w-full h-full object-contain opacity-[0.08] pointer-events-none select-none"
+                            className="absolute inset-0 z-0 w-full h-full object-contain opacity-[0.1] pointer-events-none select-none lg:scale-[2.2]"
                         />
                         <p className="relative z-10 text-xs sm:text-base lg:text-lg text-dark-gray leading-relaxed">
                             {renderWithEmphasis(t.about.paragraph1)}
@@ -63,7 +63,7 @@ export default function About({language}) {
                             src={buddhismIcon}
                             alt=""
                             aria-hidden="true"
-                            className="absolute inset-0 z-0 w-full h-full object-contain opacity-[0.08] pointer-events-none select-none"
+                            className="absolute inset-0 z-0 w-full h-full object-contain opacity-[0.1] pointer-events-none select-none lg:scale-[2.2]"
                         />
                         <p className="relative z-10 text-xs sm:text-base lg:text-lg text-dark-gray leading-relaxed">
                             {renderWithEmphasis(t.about.paragraph2)}
