@@ -1,5 +1,5 @@
 import {translations} from '../translations'
-import giftcardImg from '../assets/images/giftcard.png'
+import giftcardImg from '../assets/images/giftcard.webp'
 import Parallax from './Parallax'
 
 export default function GiftCard({language}) {
