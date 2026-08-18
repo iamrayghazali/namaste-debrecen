@@ -1,20 +1,23 @@
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useLayoutEffect, useRef, useState} from 'react'
 import {FiMenu, FiX} from 'react-icons/fi'
 import {translations} from '../translations'
 import logoWhite from '../assets/logo/namaste-white-logo.png'
+import Reveal from './Reveal'
 
 const FLAGS = {
     en: '🇬🇧',
     hu: '🇭🇺',
 }
 
-// Fades from opaque at the top to fully transparent at the bottom — applied
-// to the strip beneath the bar so the blur melts into the page instead of
-// ending in a hard edge.
+const SECTION_IDS = ['home', 'about', 'packages', 'giftcard', 'contact']
+
+const NAV_OFFSET = 110
+
 const EDGE_FADE = 'linear-gradient(to bottom, black 0%, transparent 100%)'
 
 export default function Navbar({language, setLanguage}) {
     const [isOpen, setIsOpen] = useState(false)
+    const [activeSection, setActiveSection] = useState(SECTION_IDS[0])
     const navRef = useRef(null)
     const t = translations[language]
 
@@ -28,8 +31,68 @@ export default function Navbar({language, setLanguage}) {
 
     const targetLanguage = language === 'en' ? 'hu' : 'en'
 
-    // Standard overlay behavior: close on Escape or an outside click, and
-    // lock background scroll while the menu is open.
+    // Sliding highlights behind the active link — one for the desktop row
+    // (slides horizontally), one for the mobile list (slides vertically).
+    const desktopNavRef = useRef(null)
+    const mobileNavRef = useRef(null)
+    const desktopLinkRefs = useRef({})
+    const mobileLinkRefs = useRef({})
+    const [desktopIndicator, setDesktopIndicator] = useState({left: 0, width: 0})
+    const [mobileIndicator, setMobileIndicator] = useState({top: 0, height: 0})
+
+    useEffect(() => {
+        let ticking = false
+
+        const update = () => {
+            let current = SECTION_IDS[0]
+            for (const id of SECTION_IDS) {
+                const el = document.getElementById(id)
+                if (!el) continue
+                if (el.getBoundingClientRect().top <= NAV_OFFSET) {
+                    current = id
+                } else {
+                    break
+                }
+            }
+            setActiveSection(current)
+        }
+
+        const handleScroll = () => {
+            if (ticking) return
+            ticking = true
+            requestAnimationFrame(() => {
+                update()
+                ticking = false
+            })
+        }
+
+        update()
+        window.addEventListener('scroll', handleScroll, {passive: true})
+        window.addEventListener('resize', handleScroll)
+        return () => {
+            window.removeEventListener('scroll', handleScroll)
+            window.removeEventListener('resize', handleScroll)
+        }
+    }, [])
+
+    useLayoutEffect(() => {
+        const updateIndicators = () => {
+            const desktopEl = desktopLinkRefs.current[`#${activeSection}`]
+            if (desktopEl) {
+                setDesktopIndicator({left: desktopEl.offsetLeft, width: desktopEl.offsetWidth})
+            }
+            const mobileEl = mobileLinkRefs.current[`#${activeSection}`]
+            if (mobileEl) {
+                setMobileIndicator({top: mobileEl.offsetTop, height: mobileEl.offsetHeight})
+            }
+        }
+
+        updateIndicators()
+        window.addEventListener('resize', updateIndicators)
+        return () => window.removeEventListener('resize', updateIndicators)
+    }, [activeSection, language])
+
+
     useEffect(() => {
         if (!isOpen) return
 
@@ -42,20 +105,18 @@ export default function Navbar({language, setLanguage}) {
 
         document.addEventListener('keydown', handleKeyDown)
         document.addEventListener('mousedown', handleClickOutside)
-        const previousOverflow = document.body.style.overflow
-        document.body.style.overflow = 'hidden'
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
             document.removeEventListener('mousedown', handleClickOutside)
-            document.body.style.overflow = previousOverflow
         }
     }, [isOpen])
 
     return (
         <nav ref={navRef} className="sticky top-0 z-50">
-            {/* Solid bar */}
-            <div className="relative bg-light-gray">
+            {/* Solid bar — eases down into place on first load instead of
+                just being there */}
+            <Reveal duration={600} distance={-12} className="relative bg-light-gray">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-18">
                         {/* Logo */}
@@ -64,16 +125,31 @@ export default function Navbar({language, setLanguage}) {
                         </a>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden md:flex items-center gap-8">
-                            {navItems.map((item) => (
-                                <a
-                                    key={item.href}
-                                    href={item.href}
-                                    className="text-sm font-medium text-dark-gray hover:opacity-70 transition-opacity duration-200"
-                                >
-                                    {item.label}
-                                </a>
-                            ))}
+                        <div ref={desktopNavRef} className="hidden md:flex relative items-center gap-2">
+                            {/* Sliding highlight behind the active link */}
+                            <span
+                                className="absolute top-1/2 -translate-y-1/2 h-9 rounded-full bg-dark-gray/10 transition-all duration-500 ease-out pointer-events-none"
+                                style={{left: desktopIndicator.left, width: desktopIndicator.width}}
+                            />
+                            {navItems.map((item) => {
+                                const isActive = activeSection === item.href.slice(1)
+                                return (
+                                    <a
+                                        key={item.href}
+                                        ref={(el) => {
+                                            desktopLinkRefs.current[item.href] = el
+                                        }}
+                                        href={item.href}
+                                        className={`relative z-10 px-3 py-1.5 rounded-full text-sm transition-colors duration-200 ${
+                                            isActive
+                                                ? 'text-dark-gray font-bold'
+                                                : 'text-dark-gray font-medium hover:opacity-70'
+                                        }`}
+                                    >
+                                        {item.label}
+                                    </a>
+                                )
+                            })}
                         </div>
 
                         {/* Language Switcher + Hamburger */}
@@ -101,7 +177,7 @@ export default function Navbar({language, setLanguage}) {
                         </div>
                     </div>
                 </div>
-            </div>
+            </Reveal>
 
             {/* Soft blurred edge beneath the bar, melting into the page instead
                 of ending with a hard line. */}
@@ -121,18 +197,31 @@ export default function Navbar({language, setLanguage}) {
                 }`}
                 aria-hidden={!isOpen}
             >
-                <div className="px-4 py-4 space-y-1">
-                    {navItems.map((item) => (
-                        <a
-                            key={item.href}
-                            href={item.href}
-                            tabIndex={isOpen ? 0 : -1}
-                            className="block px-3 py-3 rounded text-dark-gray hover:bg-dark-gray/5 transition-colors duration-200"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            {item.label}
-                        </a>
-                    ))}
+                <div ref={mobileNavRef} className="relative px-4 py-4 space-y-1">
+                    {/* Sliding highlight behind the active link */}
+                    <span
+                        className="absolute left-4 right-4 rounded bg-dark-gray/10 transition-all duration-500 ease-out pointer-events-none"
+                        style={{top: mobileIndicator.top, height: mobileIndicator.height}}
+                    />
+                    {navItems.map((item) => {
+                        const isActive = activeSection === item.href.slice(1)
+                        return (
+                            <a
+                                key={item.href}
+                                ref={(el) => {
+                                    mobileLinkRefs.current[item.href] = el
+                                }}
+                                href={item.href}
+                                tabIndex={isOpen ? 0 : -1}
+                                className={`relative z-10 block px-3 py-3 rounded transition-colors duration-200 ${
+                                    isActive ? 'text-dark-gray font-bold' : 'text-dark-gray font-normal hover:bg-dark-gray/5'
+                                }`}
+                                onClick={() => setIsOpen(false)}
+                            >
+                                {item.label}
+                            </a>
+                        )
+                    })}
                 </div>
             </div>
         </nav>
